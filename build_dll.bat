@@ -30,6 +30,7 @@ RD /S /Q %ROOT_DIR%\tmp_libboost >nul 2>&1
 RD /S /Q %ROOT_DIR%\third-party >nul 2>&1
 DEL /Q %ROOT_DIR%\tmp_url >nul 2>&1
 DEL /Q %ROOT_DIR%\boost.7z >nul 2>&1
+DEL /Q %ROOT_DIR%\libboost.7z >nul 2>&1
 
 REM Get download url.
 echo Get download url...
@@ -60,6 +61,9 @@ move boost ..\tmp
 cd ..
 %RM% -rf boost*
 ren tmp boost
+
+cd %ROOT_DIR%\third-party
+%SEVEN_ZIP% a -t7z ../libboost.7z  libboost
 
 REM Cleanup temporary file/folders
 cd %ROOT_DIR%
