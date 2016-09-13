@@ -16,14 +16,14 @@ set VSPC="%CD%\bin\vspc\vspc.exe"
 
 set "param1=%1"
 set "param2=%2"
-if "!param1!"=="" ( set ADRESSMODEL=64 )else ( set ADRESSMODEL=!param1!)
+if "!param1!"=="" ( set ADRESS_MODEL=64 )else ( set ADRESS_MODEL=!param1!)
 rem ... or use the DEFINED keyword now
-rem if defined param1 ( set ADRESSMODEL=%1 )
-if "!param2!"=="" ( set TOOLSET=msvc )else ( set TOOLSET=!param2! )
+rem if defined param1 ( set ADRESS_MODEL=%1 )
+if "!param2!"=="" ( set TOOL_SET=msvc )else ( set TOOL_SET=!param2! )
 rem ... or use the DEFINED keyword now
 rem if defined param2 ( set TOOLSET=%2 )
 
-echo Building with toolset=%TOOLSET% and address-model=%ADRESSMODEL%
+echo Building with toolset=%TOOL_SET% and address-model=%ADRESS_MODEL%
 
 REM Housekeeping
 
@@ -48,7 +48,7 @@ echo Extracting boost.7z ... (Please wait, this may take a while)
 
 cd %ROOT_DIR%\tmp_libboost\boost*
 CALL bootstrap.bat
-b2 install toolset=%TOOLSET% variant=release,debug link=static threading=multi address-model=%ADRESSMODEL% --prefix=%ROOT_DIR%\third-party\libboost --without-python --stagedir=./stage
+b2 install toolset=%TOOL_SET% variant=release,debug link=static threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --without-python --stagedir=./stage
 
 REM copy files
 REM echo Copying output files...
