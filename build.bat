@@ -48,7 +48,7 @@ echo Extracting boost.7z ... (Please wait, this may take a while)
 
 cd %ROOT_DIR%\tmp_libboost\boost*
 CALL bootstrap.bat
-b2 install toolset=%TOOL_SET% variant=release,debug link=static,shared threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --without-python --stagedir=./stage
+b2 install toolset=%TOOL_SET% variant=release,debug link=static,shared threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
 
 REM copy files
 echo Copying output files...
