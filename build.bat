@@ -16,13 +16,14 @@ set VSPC="%CD%\bin\vspc\vspc.exe"
 
 set "param1=%1"
 set "param2=%2"
-if "!param1!"=="" ( set ADRESSMODEL=64 )
+if "!param1!"=="" ( set ADRESSMODEL=64 )else ( set ADRESSMODEL=!param1!)
 rem ... or use the DEFINED keyword now
-if defined param1 ( set ADRESSMODEL=%1 )
-if "!param2!"=="" ( set TOOLSET=msvc )
+rem if defined param1 ( set ADRESSMODEL=%1 )
+if "!param2!"=="" ( set TOOLSET=msvc )else ( set TOOLSET=!param2! )
 rem ... or use the DEFINED keyword now
-if defined param2 ( set TOOLSET=%2 )
+rem if defined param2 ( set TOOLSET=%2 )
 
+echo Building with toolset=%TOOLSET% and address-model=%ADRESSMODEL%
 
 REM Housekeeping
 
