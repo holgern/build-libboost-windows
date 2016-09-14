@@ -44,7 +44,7 @@ echo Downloading latest stable boost...
 %WGET% "%url%" -O boost.7z
 
 echo Extracting boost.7z ... (Please wait, this may take a while)
-%SEVEN_ZIP% x boost.7z -y -otmp_libboost | FIND /V "ing  " | FIND /V "Igor Pavlov"
+%SEVEN_ZIP% x boost.7z -y -otmp_libboost 
 
 cd %ROOT_DIR%\tmp_libboost\boost*
 CALL bootstrap.bat

@@ -10,9 +10,29 @@ Please keep in mind compiling Boost library takes a very long time.
 
 2. Open command prompt and cd to `xxx/build-libboost-windows`
 
-3. Run this command:
+3. Run this command for building static and shared library:
 ```
-build.bat
+build.bat 32 msvc
+```
+or for 64 bit
+```
+build.bat 32 msvc
+```
+Run this command for building  shared library:
+```
+build_dll.bat 32 msvc
+```
+or for 64 bit
+```
+build_dll.bat 64 msvc
+```
+Run this command for building  static library:
+```
+build_lib.bat 32 msvc
+```
+or for 64 bit
+```
+build_lib.bat 64 msvc
 ```
 
 **Third-party**:
