@@ -33,9 +33,9 @@ echo Building with toolset=%TOOL_SET%, library-type=%LIBRARY_TYPE% and address-m
 set OUTPUT_FILE = libboost_%ADRESS_MODEL%_%TOOL_SET%_%LIBRARY_TYPE%.7z
 
 if /i "%ADRESS_MODEL%" == "32" (
-	SET USER_CONFIG=%~dp0user-config.jam
+	SET USER_CONFIG=%ROOT_DIR%\user-config.jam
 ) else (
-	SET USER_CONFIG=%~dp0user-config64.jam
+	SET USER_CONFIG=%ROOT_DIR%\user-config64.jam
 )
 
 REM Housekeeping
