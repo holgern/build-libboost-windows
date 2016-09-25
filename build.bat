@@ -30,14 +30,15 @@ rem if defined param2 ( set TOOL_SET=%2 )
 
 echo Building with toolset=%TOOL_SET%, library-type=%LIBRARY_TYPE% and address-model=%ADRESS_MODEL% 
 
-set OUTPUT_FILE = libboost_%ADRESS_MODEL%_%TOOL_SET%_%LIBRARY_TYPE%.7z
+SET "OUTPUT_FILE = libboost_%ADRESS_MODEL%_%TOOL_SET%_%LIBRARY_TYPE%.7z"
 
-if /i "%ADRESS_MODEL%" == "32" (
-	SET USER_CONFIG=%ROOT_DIR%\user-config.jam
-) else (
-	SET USER_CONFIG=%ROOT_DIR%\user-config64.jam
+if /i "!arg[3]!" == "--with-python" (
+	if /i "%ADRESS_MODEL%" == "32" (
+		SET USER_CONFIG=%ROOT_DIR%\user-config.jam
+	) else (
+		SET USER_CONFIG=%ROOT_DIR%\user-config64.jam
+	)
 )
-
 REM Housekeeping
 
 RD /S /Q %ROOT_DIR%\tmp_libboost >nul 2>&1
@@ -47,7 +48,6 @@ RD /S /Q %ROOT_DIR%\third-party >nul 2>&1
 
 DEL /Q %ROOT_DIR%\tmp_url >nul 2>&1
 DEL /Q %ROOT_DIR%\boost.7z >nul 2>&1
-DEL /Q %ROOT_DIR%\%OUTPUT_FILE% >nul 2>&1
 
 REM Get download url.
 echo Get download url...
