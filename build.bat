@@ -77,17 +77,19 @@ CALL bootstrap.bat
 if /i "%LIBRARY_TYPE%" == "all" (
 	set __link = static,shared
 ) else if /i "%LIBRARY_TYPE%" == "static" (
-	set __link=static
+	set __link=%LIBRARY_TYPE%
 ) else if /i "%LIBRARY_TYPE%" == "shared" (
-	set __link=shared
+	set __link=%LIBRARY_TYPE%
 ) else (
 	goto usage
 )
 
 set __variant = release,debug
 
+echo bootstrap ok! Building with variant=%__variant%, link-type=%__link%
+
 if /i "!arg[3]!" == "--with-python" (
-	b2 install toolset=%TOOL_SET% variant=%__variant% link=%__link% threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --user-config=!USER_CONFIG! --with-python --abbreviate-paths --stagedir=./stage
+	b2 install toolset=%TOOL_SET% variant=%__variant% link=%__link% threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --user-config=%USER_CONFIG% --with-python --abbreviate-paths --stagedir=./stage
 ) else if /i "!arg[3]!" == "" (
 	b2 install toolset=%TOOL_SET% variant=%__variant% link=%__link% threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
 ) else (
