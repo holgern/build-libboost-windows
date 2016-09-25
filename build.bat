@@ -104,32 +104,54 @@ GOTO :eof
 rem ========================================================================================================
 :buildboost
 cd %ROOT_DIR%\tmp_libboost\boost*
-REM CALL bootstrap.bat
+set BOOST_SRC_DIR="%CD%"
 
-echo bootstrap ok! 
+SET BOOST_JAM=!BOOST_SRC_DIR!\b2.exe
+
+IF NOT EXIST "!BOOST_JAM!" (
+	
+	pushd !BOOST_SRC_DIR!
+		echo:
+		call bootstrap.bat
+		echo:
+	popd
+	
+	IF NOT EXIST "!BOOST_JAM!" (
+		call :exitB "Failed to build Boost Jam (!BOOST_JAM!). Aborting."
+	) else (
+		echo:
+		echo Build Boost Jam: !BOOST_JAM!
+		echo:
+	)
+) else (
+	echo:
+	echo Using Boost Jam: !BOOST_JAM!
+	echo:
+)
+
 
 if /i "!arg[3]!" == "--with-python" (
 	if /i "%LIBRARY_TYPE%" == "all" (
-		echo b2 install toolset=%TOOL_SET% variant=release,debug link=static,shared threading=multi address-model=%ADRESS_MODEL% --prefix=!ROOT_DIR!\third-party\libboost ---user-config=%USER_CONFIG% --with-python --abbreviate-paths --stagedir=./stage
+		!BOOST_JAM! install toolset=%TOOL_SET% variant=release,debug link=static,shared threading=multi address-model=%ADRESS_MODEL% --prefix=!ROOT_DIR!\third-party\libboost ---user-config=%USER_CONFIG% --with-python --abbreviate-paths --stagedir=./stage
 
 	) else if /i "%LIBRARY_TYPE%" == "static" (
-		echo b2 install toolset=%TOOL_SET% variant=release,debug link=static threading=multi address-model=%ADRESS_MODEL% --prefix=!ROOT_DIR!\third-party\libboost --user-config=%USER_CONFIG% --with-python --abbreviate-paths --stagedir=./stage
+		!BOOST_JAM! install toolset=%TOOL_SET% variant=release,debug link=static threading=multi address-model=%ADRESS_MODEL% --prefix=!ROOT_DIR!\third-party\libboost --user-config=%USER_CONFIG% --with-python --abbreviate-paths --stagedir=./stage
 
 	) else if /i "%LIBRARY_TYPE%" == "shared" (
-		echo b2 install toolset=%TOOL_SET% variant=release,debug link=shared threading=multi address-model=%ADRESS_MODEL% --prefix=!ROOT_DIR!\third-party\libboost --user-config=%USER_CONFIG% --with-python --abbreviate-paths --stagedir=./stage
+		!BOOST_JAM! install toolset=%TOOL_SET% variant=release,debug link=shared threading=multi address-model=%ADRESS_MODEL% --prefix=!ROOT_DIR!\third-party\libboost --user-config=%USER_CONFIG% --with-python --abbreviate-paths --stagedir=./stage
 
 	) else (
 		goto usage
 	)
 ) else if /i "!arg[3]!" == "" (
 	if /i "%LIBRARY_TYPE%" == "all" (
-			echo b2 install toolset=%TOOL_SET% variant=release,debug link=static,shared threading=multi address-model=%ADRESS_MODEL% --prefix=!ROOT_DIR!\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
+			!BOOST_JAM! install toolset=%TOOL_SET% variant=release,debug link=static,shared threading=multi address-model=%ADRESS_MODEL% --prefix=!ROOT_DIR!\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
 
 	) else if /i "%LIBRARY_TYPE%" == "static" (
-			echo b2 install toolset=%TOOL_SET% variant=release,debug link=static threading=multi address-model=%ADRESS_MODEL% --prefix=!ROOT_DIR!\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
+			!BOOST_JAM! install toolset=%TOOL_SET% variant=release,debug link=static threading=multi address-model=%ADRESS_MODEL% --prefix=!ROOT_DIR!\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
 
 	) else if /i "%LIBRARY_TYPE%" == "shared" (
-			echo b2 install toolset=%TOOL_SET% variant=release,debug link=shared threading=multi address-model=%ADRESS_MODEL% --prefix=!ROOT_DIR!\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
+			!BOOST_JAM! install toolset=%TOOL_SET% variant=release,debug link=shared threading=multi address-model=%ADRESS_MODEL% --prefix=!ROOT_DIR!\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
 
 	) else (
 		goto usage
