@@ -30,7 +30,11 @@ rem if defined param2 ( set TOOL_SET=%2 )
 
 echo Building with toolset=!TOOL_SET!, library-type=!LIBRARY_TYPE! and address-model=!ADRESS_MODEL! 
 
-SET OUTPUT_FILE=libboost_!ADRESS_MODEL!_!LIBRARY_TYPE!.7z
+Echo.!TOOL_SET! | findstr /C:"msvc">nul && (
+    SET OUTPUT_FILE=libboost_vc%TOOL_SET:~5,2%_!ADRESS_MODEL!_!LIBRARY_TYPE!.7z
+) || (
+    SET OUTPUT_FILE=libboost_!ADRESS_MODEL!_!LIBRARY_TYPE!.7z
+)
 
 if /i "!arg[3]!" == "--with-python" (
 	if /i "!ADRESS_MODEL!" == "32" (
