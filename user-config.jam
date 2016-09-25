@@ -1,0 +1,4 @@
+using python : 2.7 : C:\\\Python27\\\python.exe
+  : C:\\\Python27\\\include
+  : C:\\\Python27\\\libs
+  : <address-model>32 ;
