@@ -59,8 +59,18 @@ REM Download latest curl and rename to fltk.tar.gz
 echo Downloading latest stable boost...
 %WGET% "%url%" -O boost.7z
 
+IF NOT EXIST "boost.7z" (
+	echo:
+	CALL :exitB "ERROR: Could not download boost.7z. Aborting."
+	GOTO :eof
+)
 echo Extracting boost.7z ... (Please wait, this may take a while)
 %SEVEN_ZIP% x boost.7z -y -otmp_libboost
+IF NOT EXIST "%ROOT_DIR%\tmp_libboost" (
+	echo:
+	CALL :exitB "ERROR: Could extract sources. Aborting."
+	GOTO :eof
+)
 
 cd %ROOT_DIR%\tmp_libboost\boost*
 CALL bootstrap.bat
