@@ -19,7 +19,7 @@ SET arg[1]=%2
 SET arg[2]=%3
 SET arg[3]=%4
 
-if "!arg[0]!"=="" ( set LIBRARY_TYPE="all" )else ( set LIBRARY_TYPE=!arg[0]!)
+if "!arg[0]!"=="" ( set _LIBRARY_TYPE="all" )else ( set _LIBRARY_TYPE=!arg[0]!)
 
 if "!arg[1]!"=="" ( set ADRESS_MODEL=64 )else ( set ADRESS_MODEL=!arg[1]!)
 rem ... or use the DEFINED keyword now
@@ -28,9 +28,9 @@ if "!arg[2]!"=="" ( set TOOL_SET=msvc )else ( set TOOL_SET=!arg[2]! )
 rem ... or use the DEFINED keyword now
 rem if defined param2 ( set TOOL_SET=%2 )
 
-echo Building with toolset=%TOOL_SET%, library-type=%LIBRARY_TYPE% and address-model=%ADRESS_MODEL% 
+echo Building with toolset=%TOOL_SET%, library-type=%_LIBRARY_TYPE% and address-model=%ADRESS_MODEL% 
 
-SET "OUTPUT_FILE = libboost_%ADRESS_MODEL%_%TOOL_SET%_%LIBRARY_TYPE%.7z"
+SET "_OUTPUT_FILE = libboost_%ADRESS_MODEL%_%TOOL_SET%_%_LIBRARY_TYPE%.7z"
 
 if /i "!arg[3]!" == "--with-python" (
 	if /i "%ADRESS_MODEL%" == "32" (
@@ -74,30 +74,44 @@ IF NOT EXIST "%ROOT_DIR%\tmp_libboost" (
 
 cd %ROOT_DIR%\tmp_libboost\boost*
 CALL bootstrap.bat
-if /i "%LIBRARY_TYPE%" == "all" (
-	set __link = static,shared
-) else if /i "%LIBRARY_TYPE%" == "static" (
-	set __link=%LIBRARY_TYPE%
-) else if /i "%LIBRARY_TYPE%" == "shared" (
-	set __link=%LIBRARY_TYPE%
-) else (
-	goto usage
-)
 
 
-echo bootstrap ok! Building with variant=release,debug, link-type=%__link%
+
+echo bootstrap ok! 
 
 if /i "!arg[3]!" == "--with-python" (
-	b2 install toolset=%TOOL_SET% variant=release,debug link=%__link% threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --user-config=%USER_CONFIG% --with-python --abbreviate-paths --stagedir=./stage
+	if /i "%_LIBRARY_TYPE%" == "all" (
+		b2 install toolset=%TOOL_SET% variant=release,debug link=static,shared threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost ---user-config=%USER_CONFIG% --with-python --abbreviate-paths --stagedir=./stage
+
+	) else if /i "%_LIBRARY_TYPE%" == "static" (
+		b2 install toolset=%TOOL_SET% variant=release,debug link=static threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --user-config=%USER_CONFIG% --with-python --abbreviate-paths --stagedir=./stage
+
+	) else if /i "%_LIBRARY_TYPE%" == "shared" (
+		b2 install toolset=%TOOL_SET% variant=release,debug link=shared threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --user-config=%USER_CONFIG% --with-python --abbreviate-paths --stagedir=./stage
+
+	) else (
+		goto usage
+	)
 ) else if /i "!arg[3]!" == "" (
-	b2 install toolset=%TOOL_SET% variant=release,debug link=%__link% threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
+	if /i "%_LIBRARY_TYPE%" == "all" (
+			b2 install toolset=%TOOL_SET% variant=release,debug link=static,shared threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
+
+	) else if /i "%_LIBRARY_TYPE%" == "static" (
+			b2 install toolset=%TOOL_SET% variant=release,debug link=static threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
+
+	) else if /i "%_LIBRARY_TYPE%" == "shared" (
+			b2 install toolset=%TOOL_SET% variant=release,debug link=shared threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
+
+	) else (
+		goto usage
+	)
 ) else (
 	goto usage
 )
 REM copy files
 echo Copying output files...
 
-if /i "%LIBRARY_TYPE%" == "all" (
+if /i "%_LIBRARY_TYPE%" == "all" (
 	cd %ROOT_DIR%\third-party\libboost\stage\lib
 	%MKDIR% -p lib-release lib-debug dll-release dll-debug
 	move lib*-mt-gd* lib-debug
@@ -113,7 +127,7 @@ cd ..
 ren tmp boost
 
 cd %ROOT_DIR%\third-party
-%SEVEN_ZIP% a -t7z ../%OUTPUT_FILE%  libboost
+%SEVEN_ZIP% a -t7z ../%_OUTPUT_FILE%  libboost
 
 REM Cleanup temporary file/folders
 cd %ROOT_DIR%
