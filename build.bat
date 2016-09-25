@@ -1,5 +1,5 @@
 @echo off
-setlocal EnableDelayedExpansion 
+SETLOCAL EnableExtensions EnableDelayedExpansion
 
 echo Preparing workspace...
 
@@ -19,7 +19,7 @@ SET arg[1]=%2
 SET arg[2]=%3
 SET arg[3]=%4
 
-if "!arg[0]!"=="" ( set _LIBRARY_TYPE="all" )else ( set _LIBRARY_TYPE=!arg[0]!)
+if "!arg[0]!"=="" ( set LIBRARY_TYPE="all" )else ( set LIBRARY_TYPE=!arg[0]!)
 
 if "!arg[1]!"=="" ( set ADRESS_MODEL=64 )else ( set ADRESS_MODEL=!arg[1]!)
 rem ... or use the DEFINED keyword now
@@ -28,19 +28,35 @@ if "!arg[2]!"=="" ( set TOOL_SET=msvc )else ( set TOOL_SET=!arg[2]! )
 rem ... or use the DEFINED keyword now
 rem if defined param2 ( set TOOL_SET=%2 )
 
-echo Building with toolset=%TOOL_SET%, library-type=%_LIBRARY_TYPE% and address-model=%ADRESS_MODEL% 
+echo Building with toolset=!TOOL_SET!, library-type=!LIBRARY_TYPE! and address-model=!ADRESS_MODEL! 
 
-SET "_OUTPUT_FILE = libboost_%ADRESS_MODEL%_%TOOL_SET%_%_LIBRARY_TYPE%.7z"
+SET OUTPUT_FILE=libboost_!ADRESS_MODEL!_!LIBRARY_TYPE!.7z
 
 if /i "!arg[3]!" == "--with-python" (
-	if /i "%ADRESS_MODEL%" == "32" (
-		SET USER_CONFIG=%ROOT_DIR%\user-config.jam
+	if /i "!ADRESS_MODEL!" == "32" (
+		SET USER_CONFIG=!ROOT_DIR!\user-config.jam
 	) else (
-		SET USER_CONFIG=%ROOT_DIR%\user-config64.jam
+		SET USER_CONFIG=!ROOT_DIR!\user-config64.jam
 	)
 )
-REM Housekeeping
+call :housekeeping
 
+call :printConfiguration
+
+call :getboost
+
+call :buildboost
+
+call :packboost
+
+call :cleanup
+
+ENDLOCAL
+exit /b
+
+
+rem ========================================================================================================
+:housekeeping
 RD /S /Q %ROOT_DIR%\tmp_libboost >nul 2>&1
 RD /S /Q %ROOT_DIR%\third-party >nul 2>&1
 RD /S /Q %ROOT_DIR%\tmp_libboost >nul 2>&1
@@ -48,6 +64,19 @@ RD /S /Q %ROOT_DIR%\third-party >nul 2>&1
 
 DEL /Q %ROOT_DIR%\tmp_url >nul 2>&1
 DEL /Q %ROOT_DIR%\boost.7z >nul 2>&1
+GOTO :eof
+
+rem ========================================================================================================
+:cleanup
+REM Cleanup temporary file/folders
+cd %ROOT_DIR%
+RD /S /Q %ROOT_DIR%\tmp_libboost >nul 2>&1
+DEL /Q %ROOT_DIR%\tmp_url >nul 2>&1
+DEL /Q %ROOT_DIR%\boost.7z >nul 2>&1
+GOTO :eof
+
+rem ========================================================================================================
+:getboost
 
 REM Get download url.
 echo Get download url...
@@ -71,36 +100,36 @@ IF NOT EXIST "%ROOT_DIR%\tmp_libboost" (
 	CALL :exitB "ERROR: Could extract sources. Aborting."
 	GOTO :eof
 )
-
+GOTO :eof
+rem ========================================================================================================
+:buildboost
 cd %ROOT_DIR%\tmp_libboost\boost*
-CALL bootstrap.bat
-
-
+REM CALL bootstrap.bat
 
 echo bootstrap ok! 
 
 if /i "!arg[3]!" == "--with-python" (
-	if /i "%_LIBRARY_TYPE%" == "all" (
-		b2 install toolset=%TOOL_SET% variant=release,debug link=static,shared threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost ---user-config=%USER_CONFIG% --with-python --abbreviate-paths --stagedir=./stage
+	if /i "%LIBRARY_TYPE%" == "all" (
+		echo b2 install toolset=%TOOL_SET% variant=release,debug link=static,shared threading=multi address-model=%ADRESS_MODEL% --prefix=!ROOT_DIR!\third-party\libboost ---user-config=%USER_CONFIG% --with-python --abbreviate-paths --stagedir=./stage
 
-	) else if /i "%_LIBRARY_TYPE%" == "static" (
-		b2 install toolset=%TOOL_SET% variant=release,debug link=static threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --user-config=%USER_CONFIG% --with-python --abbreviate-paths --stagedir=./stage
+	) else if /i "%LIBRARY_TYPE%" == "static" (
+		echo b2 install toolset=%TOOL_SET% variant=release,debug link=static threading=multi address-model=%ADRESS_MODEL% --prefix=!ROOT_DIR!\third-party\libboost --user-config=%USER_CONFIG% --with-python --abbreviate-paths --stagedir=./stage
 
-	) else if /i "%_LIBRARY_TYPE%" == "shared" (
-		b2 install toolset=%TOOL_SET% variant=release,debug link=shared threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --user-config=%USER_CONFIG% --with-python --abbreviate-paths --stagedir=./stage
+	) else if /i "%LIBRARY_TYPE%" == "shared" (
+		echo b2 install toolset=%TOOL_SET% variant=release,debug link=shared threading=multi address-model=%ADRESS_MODEL% --prefix=!ROOT_DIR!\third-party\libboost --user-config=%USER_CONFIG% --with-python --abbreviate-paths --stagedir=./stage
 
 	) else (
 		goto usage
 	)
 ) else if /i "!arg[3]!" == "" (
-	if /i "%_LIBRARY_TYPE%" == "all" (
-			b2 install toolset=%TOOL_SET% variant=release,debug link=static,shared threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
+	if /i "%LIBRARY_TYPE%" == "all" (
+			echo b2 install toolset=%TOOL_SET% variant=release,debug link=static,shared threading=multi address-model=%ADRESS_MODEL% --prefix=!ROOT_DIR!\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
 
-	) else if /i "%_LIBRARY_TYPE%" == "static" (
-			b2 install toolset=%TOOL_SET% variant=release,debug link=static threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
+	) else if /i "%LIBRARY_TYPE%" == "static" (
+			echo b2 install toolset=%TOOL_SET% variant=release,debug link=static threading=multi address-model=%ADRESS_MODEL% --prefix=!ROOT_DIR!\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
 
-	) else if /i "%_LIBRARY_TYPE%" == "shared" (
-			b2 install toolset=%TOOL_SET% variant=release,debug link=shared threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
+	) else if /i "%LIBRARY_TYPE%" == "shared" (
+			echo b2 install toolset=%TOOL_SET% variant=release,debug link=shared threading=multi address-model=%ADRESS_MODEL% --prefix=!ROOT_DIR!\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
 
 	) else (
 		goto usage
@@ -108,10 +137,13 @@ if /i "!arg[3]!" == "--with-python" (
 ) else (
 	goto usage
 )
+GOTO :eof
+rem ========================================================================================================
+:packboost
 REM copy files
 echo Copying output files...
 
-if /i "%_LIBRARY_TYPE%" == "all" (
+if /i "%LIBRARY_TYPE%" == "all" (
 	cd %ROOT_DIR%\third-party\libboost\stage\lib
 	%MKDIR% -p lib-release lib-debug dll-release dll-debug
 	move lib*-mt-gd* lib-debug
@@ -127,17 +159,8 @@ cd ..
 ren tmp boost
 
 cd %ROOT_DIR%\third-party
-%SEVEN_ZIP% a -t7z ../%_OUTPUT_FILE%  libboost
-
-REM Cleanup temporary file/folders
-cd %ROOT_DIR%
-RD /S /Q %ROOT_DIR%\tmp_libboost >nul 2>&1
-DEL /Q %ROOT_DIR%\tmp_url >nul 2>&1
-DEL /Q %ROOT_DIR%\boost.7z >nul 2>&1
-
-exit /b
-
-
+%SEVEN_ZIP% a -t7z ../!OUTPUT_FILE!  libboost
+GOTO :eof
 rem ========================================================================================================
 :usage
 rem call :printConfiguration
@@ -149,6 +172,22 @@ ECHO     build [all^|shared^|static] [32^|64] compiler - build boost without pyt
 ECHO     build [all^|shared^|static] [32^|64] compiler --with-python - build boost with python
 ECHO:    
 GOTO :eof
+rem ========================================================================================================
+:printConfiguration
+SETLOCAL EnableExtensions EnableDelayedExpansion
+
+echo:
+echo                    ROOT_DIR: !ROOT_DIR!
+echo:
+
+echo              OUTPUT_FILE: !OUTPUT_FILE!
+echo:
+echo        SEVEN_ZIP: !SEVEN_ZIP!
+echo:
+echo           WGET: !WGET!
+ENDLOCAL
+goto :eof
+
 rem ========================================================================================================
 
 :: %1 an error message
