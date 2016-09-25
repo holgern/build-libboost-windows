@@ -80,6 +80,7 @@ rem ============================================================================
 
 REM Get download url.
 echo Get download url...
+cd %ROOT_DIR%
 %XIDEL% "http://www.boost.org/" --follow "(//div[@id='downloads']/ul/li/div/a)[3]/@href" -e "//a[text()[contains(.,'7z')]]/@href" > tmp_url
 
 set /p url=<tmp_url
@@ -94,7 +95,7 @@ IF NOT EXIST "boost.7z" (
 	GOTO :eof
 )
 echo Extracting boost.7z ... (Please wait, this may take a while)
-%SEVEN_ZIP% x boost.7z -y -otmp_libboost
+!SEVEN_ZIP! x boost.7z -y -otmp_libboost
 IF NOT EXIST "%ROOT_DIR%\tmp_libboost" (
 	echo:
 	CALL :exitB "ERROR: Could extract sources. Aborting."
@@ -181,7 +182,7 @@ cd ..
 ren tmp boost
 
 cd %ROOT_DIR%\third-party
-%SEVEN_ZIP% a -t7z ../!OUTPUT_FILE!  libboost
+!SEVEN_ZIP! a -t7z ../!OUTPUT_FILE!  libboost
 GOTO :eof
 rem ========================================================================================================
 :usage
