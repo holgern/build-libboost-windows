@@ -76,9 +76,9 @@ if /i "%LIBRARY_TYPE%" == "all" (
 
 set __variant = release,debug
 
-if /i "!arg[2]!" == "--with-python" (
+if /i "!arg[3]!" == "--with-python" (
 	b2 install toolset=%TOOL_SET% variant=%__variant% link=%__link% threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --user-config=!USER_CONFIG! --with-python --abbreviate-paths --stagedir=./stage
-) else if /i "!arg[2]!" == "" (
+) else if /i "!arg[3]!" == "" (
 	b2 install toolset=%TOOL_SET% variant=%__variant% link=%__link% threading=multi address-model=%ADRESS_MODEL% --prefix=%ROOT_DIR%\third-party\libboost --without-python --abbreviate-paths --stagedir=./stage
 ) else (
 	goto usage
