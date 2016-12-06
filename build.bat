@@ -19,7 +19,7 @@ SET arg[1]=%2
 SET arg[2]=%3
 SET arg[3]=%4
 
-if "!arg[0]!"=="" ( set LIBRARY_TYPE="all" )else ( set LIBRARY_TYPE=!arg[0]!)
+if "!arg[0]!"=="" ( set LIBRARY_TYPE=all )else ( set LIBRARY_TYPE=!arg[0]!)
 
 if "!arg[1]!"=="" ( set ADRESS_MODEL=64 )else ( set ADRESS_MODEL=!arg[1]!)
 rem ... or use the DEFINED keyword now
@@ -33,8 +33,11 @@ echo Building with toolset=!TOOL_SET!, library-type=!LIBRARY_TYPE! and address-m
 Echo.!TOOL_SET! | findstr /C:"msvc">nul && (
     SET OUTPUT_FILE=libboost_vc%TOOL_SET:~5,2%_!ADRESS_MODEL!_!LIBRARY_TYPE!.7z
 ) || (
-    SET OUTPUT_FILE=libboost_!ADRESS_MODEL!_!LIBRARY_TYPE!.7z
+    SET OUTPUT_FILE=libboost_!TOOL_SET!_!ADRESS_MODEL!_!LIBRARY_TYPE!.7z
 )
+
+set OUTPUT_FILE=%OUTPUT_FILE: =%
+set OUTPUT_FILE=%OUTPUT_FILE:.=%
 
 if /i "!arg[3]!" == "--with-python" (
 	if /i "!ADRESS_MODEL!" == "32" (
